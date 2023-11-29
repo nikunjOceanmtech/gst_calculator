@@ -24,19 +24,21 @@ class GstCalculatorCubit extends Cubit<GstCalculatorState> {
     answerper = "";
     textEditingController.clear();
     cursor = 0;
-    emit(GstCalculatorLoadedState(
-      addValue: "",
-      totalValue: "",
-      csGst: "",
-      csGstPer: "",
-      iGst: "",
-      iGstPer: "",
-      totalWithGst: "",
-      button: false,
-      islastEqul: false,
-      textEditingController: TextEditingController(),
-      cursorPos: -1,
-    ));
+    emit(
+      GstCalculatorLoadedState(
+        addValue: "",
+        totalValue: "",
+        csGst: "",
+        csGstPer: "",
+        iGst: "",
+        iGstPer: "",
+        totalWithGst: "",
+        button: false,
+        islastEqul: false,
+        textEditingController: TextEditingController(),
+        cursorPos: -1,
+      ),
+    );
   }
 
   void calculation({required String name, required GstCalculatorLoadedState state, required BuildContext context}) {
@@ -49,13 +51,14 @@ class GstCalculatorCubit extends Cubit<GstCalculatorState> {
         emit(state.copywith(button: true, islastEqul: true));
       }
     } else if (name == "⌫") {
-      String vales = remove(state: state);
+      String vales = remove(state: state, context: context);
       if (vales.endsWith("x") == true ||
           vales.endsWith("+") == true ||
           vales.endsWith("-") == true ||
           vales.endsWith("÷") == true ||
           vales.endsWith("%") == true ||
           vales.endsWith(".") == true) {
+        vales = vales;
       } else {
         equal(state: state, context: context, values: vales, button: false);
       }
@@ -302,11 +305,12 @@ class GstCalculatorCubit extends Cubit<GstCalculatorState> {
     return answers.toString();
   }
 
-  double equal(
-      {required GstCalculatorLoadedState state,
-      required BuildContext context,
-      required String values,
-      required bool button}) {
+  double equal({
+    required GstCalculatorLoadedState state,
+    required BuildContext context,
+    required String values,
+    required bool button,
+  }) {
     String value = values.replaceAll('x', '*');
     value = value.replaceAll('÷', "/");
     value = value.replaceAll(',', "");
@@ -388,30 +392,38 @@ class GstCalculatorCubit extends Cubit<GstCalculatorState> {
     return eval;
   }
 
-  String remove({required GstCalculatorLoadedState state}) {
+  String remove({required GstCalculatorLoadedState state, required BuildContext context}) {
     String vales = textEditingController.text;
-    if (vales.length > 1 && vales != "0") {
+    cursor = textEditingController.selection.base.offset;
+    if (cursor != 0) {
+      vales = vales.replaceRange(cursor - 1, cursor, '');
+      cursor = cursor - 1;
+    } else if (cursor == 0) {
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Data Not Remove")));
+      null;
+    } else if (vales.length > 1 && vales != "0") {
       vales = vales.substring(0, vales.length - 1);
       cursor = cursor - 1;
     } else {
       vales = "";
       cursor = 0;
     }
-
     TextEditingController text = TextEditingController(text: vales);
     text.selection = TextSelection.collapsed(offset: cursor);
     textEditingController = text;
 
-    emit(state.copywith(
-      addValue: vales,
-      textEditingController: textEditingController,
-      totalValue: "",
-      csGst: "",
-      csGstPer: "",
-      iGst: "",
-      iGstPer: "",
-      totalWithGst: "",
-    ));
+    emit(
+      state.copywith(
+        addValue: vales,
+        textEditingController: textEditingController,
+        totalValue: "",
+        csGst: "",
+        csGstPer: "",
+        iGst: "",
+        iGstPer: "",
+        totalWithGst: "",
+      ),
+    );
     return vales;
   }
 

@@ -28,7 +28,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
           forceMaterialTransparency: true,
           title: const Text(
             "Gst Calculator",
@@ -46,113 +45,117 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Visibility(
-                              visible: state.csGst.isEmpty,
-                              child: Container(
-                                width: ScreenUtil().screenWidth * 0.95,
-                                alignment: Alignment.topRight,
-                                child: Column(
-                                  children: [
-                                    AnimatedContainer(
-                                      duration: const Duration(milliseconds: 100),
-                                      width: ScreenUtil().screenWidth * 0.95,
-                                      height: state.button || state.iGst.isNotEmpty
-                                          ? ScreenUtil().screenHeight * 0
-                                          : ScreenUtil().screenHeight * 0.2,
-                                      alignment: Alignment.topRight,
-                                      child: Visibility(
-                                        visible: state.button == false,
-                                        child: TextField(
-                                          textAlign: TextAlign.right,
-                                          keyboardType: TextInputType.none,
-                                          onChanged: (value) {
-                                            gstCalculatorCubit.textEdToetxt(state: state, text: value);
-                                          },
-                                          controller: gstCalculatorCubit.textEditingController,
-                                          decoration: const InputDecoration(border: InputBorder.none),
-                                        ),
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: state.iGst.isEmpty,
-                                      child: AnimatedContainer(
-                                        curve: Curves.linearToEaseOut,
-                                        duration: const Duration(milliseconds: 100),
-                                        alignment: Alignment.topRight,
-                                        width: ScreenUtil().screenWidth * 0.95,
-                                        height: state.button
-                                            ? ScreenUtil().screenHeight * 0.254
-                                            : ScreenUtil().screenHeight * 0.047,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Text(
-                                            state.totalValue,
-                                            style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: state.button ? 35.sp : 25.sp,
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: Visibility(
+                                  visible: state.csGst.isEmpty,
+                                  child: Container(
+                                    alignment: Alignment.topRight,
+                                    child: Column(
+                                      children: [
+                                        AnimatedContainer(
+                                          duration: const Duration(milliseconds: 100),
+                                          alignment: Alignment.topRight,
+                                          child: Visibility(
+                                            visible: state.button == false,
+                                            child: TextField(
+                                              style: TextStyle(fontSize: 25.sp),
+                                              textAlign: TextAlign.right,
+                                              keyboardType: TextInputType.none,
+                                              onChanged: (value) {
+                                                gstCalculatorCubit.textEdToetxt(state: state, text: value);
+                                              },
+                                              controller: gstCalculatorCubit.textEditingController,
+                                              decoration: const InputDecoration(border: InputBorder.none),
                                             ),
                                           ),
+                                        ),
+                                        SizedBox(height: state.button ? 0.h : 80.h),
+                                        Visibility(
+                                          visible: state.iGst.isEmpty,
+                                          child: AnimatedContainer(
+                                            curve: Curves.linearToEaseOut,
+                                            duration: const Duration(milliseconds: 100),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              overflow: TextOverflow.ellipsis,
+                                              state.totalValue,
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: state.button ? 35.sp : 30.sp,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Visibility(
+                            visible: state.totalWithGst.isNotEmpty,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    SizedBox(
+                                      width: ScreenUtil().screenWidth * 0.95,
+                                      child: Text(
+                                        overflow: TextOverflow.ellipsis,
+                                        state.totalValue,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 35.sp,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Visibility(
-                          visible: state.totalWithGst.isNotEmpty,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    state.totalValue,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 35.sp,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: ScreenUtil().screenHeight * 0.021),
-                              nameDetailRow(state: state, data: state.csGst, title: "CGST[${state.csGstPer}%]"),
-                              SizedBox(height: 4.h),
-                              nameDetailRow(state: state, data: state.csGst, title: "SGST[${state.csGstPer}%]"),
-                              SizedBox(height: 4.h),
-                              nameDetailRow(state: state, data: state.iGst, title: "IGST[${state.iGstPer}%]"),
-                              SizedBox(height: 6.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Total (With GSt)",
-                                    style: TextStyle(
-                                      color: Colors.green.shade800,
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text((state.totalWithGst),
+                                nameDetailRow(data: state.csGst, title: "CGST[${state.csGstPer}%]"),
+                                SizedBox(height: 4.h),
+                                nameDetailRow(data: state.csGst, title: "SGST[${state.csGstPer}%]"),
+                                SizedBox(height: 4.h),
+                                nameDetailRow(data: state.iGst, title: "IGST[${state.iGstPer}%]"),
+                                SizedBox(height: 6.h),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Total (With GSt)",
                                       style: TextStyle(
                                         color: Colors.green.shade800,
-                                        fontSize: 25.sp,
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.w500,
-                                      )),
-                                ],
-                              ),
-                            ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: ScreenUtil().screenWidth * 0.55,
+                                      child: Text(
+                                        overflow: TextOverflow.ellipsis,
+                                        (state.totalWithGst),
+                                        style: TextStyle(
+                                          color: Colors.green.shade800,
+                                          fontSize: 25.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     const Divider(color: Colors.black12),
                     GridView.builder(
@@ -160,8 +163,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       itemCount: gst.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 5,
-                        childAspectRatio: 7 / 4,
-                        crossAxisSpacing: 5.w,
+                        childAspectRatio: 7 / 3.5,
+                        crossAxisSpacing: 9.w,
                         mainAxisSpacing: 5.h,
                       ),
                       itemBuilder: (context, index) {
@@ -174,7 +177,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           child: Container(
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100.r),
+                              borderRadius: BorderRadius.circular(20.r),
                               color: const Color.fromARGB(13, 0, 0, 0),
                             ),
                             child: Text(
@@ -196,23 +199,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         mainAxisSpacing: 8.h,
-                        childAspectRatio: 7 / 5.5,
+                        childAspectRatio: 7 / 5.2,
                       ),
                       itemBuilder: (context, index) {
                         return InkWell(
+                          splashFactory: InkSparkle.splashFactory,
                           onTap: () {
-                            gstCalculatorCubit.cursor = gstCalculatorCubit.textEditingController.selection.baseOffset;
-                            gstCalculatorCubit.textEdToetxt(state: state, text: state.addValue);
                             HapticFeedback.vibrate();
-                            gstCalculatorCubit.calculation(
-                              name: list[index].name,
-                              state: state,
-                              context: context,
-                            );
+                            gstCalculatorCubit.calculation(name: list[index].name, state: state, context: context);
                           },
                           borderRadius: BorderRadius.circular(100.r),
                           child: Container(
-                            height: 50.h,
+                            height: 70.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color:
@@ -243,15 +241,20 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  Row nameDetailRow({required GstCalculatorLoadedState state, required String title, required String data}) {
+  Widget nameDetailRow({required String title, required String data}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
+          overflow: TextOverflow.ellipsis,
           title,
           style: TextStyle(color: Colors.black54, fontSize: 13.sp),
         ),
-        Text(data, style: TextStyle(color: Colors.black54, fontSize: 18.sp, fontWeight: FontWeight.w400)),
+        Text(
+          overflow: TextOverflow.ellipsis,
+          data,
+          style: TextStyle(color: Colors.black54, fontSize: 18.sp, fontWeight: FontWeight.w400),
+        ),
       ],
     );
   }
